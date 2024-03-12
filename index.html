@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>smile</title>
+
+    <style>
+        canvas {
+            border: 2px solid black;
+        }
+    </style>
+</head>
+<body>
+<canvas id=canvas width="200" height="200"></canvas>
+
+<script>
+    const canvas = document.getElementById('canvas')
+    const ctx = canvas.getContext('2d')
+    ctx.beginPath()
+    ctx.arc(canvas.width/2 , canvas.height/2 , 100 , 0 ,2 * Math.PI)
+    ctx.fillStyle= 'black'
+    ctx.fill()
+    const radeye = 15;
+    const lefteye = canvas.width/2 - 40;
+    const righteye = canvas.width/2 + 40;
+    const poseye = canvas.height/2 - 20;
+    console.log(lefteye , righteye , poseye)
+    ctx.beginPath()
+    ctx.arc(lefteye, poseye, radeye, 0, 2 * Math.PI)
+    ctx.arc(righteye, poseye, radeye, 0, 2 * Math.PI)
+    ctx.fillStyle = 'yellow'
+    ctx.fill()
+    let num = 1
+    document.addEventListener('keydown' , function (event){
+        console.log(event)
+        ctx.beginPath()
+        if(event.code === 'Space'){
+            if(num === 0){
+                ctx.arc(canvas.width/2 , canvas.height/2 +30 , 40 , 0 , Math.PI)
+                ctx.fillStyle = 'blue'
+                num++
+            }else{
+                ctx.arc(canvas.width/2 , canvas.height/2 +30 , 30 , 0 , Math.PI)
+                ctx.fillStyle = 'black'
+                num--
+            }
+        }
+        ctx.fill()
+    })
+    ctx.beginPath()
+    ctx.arc(canvas.width/2 , canvas.height/2 +30 , 40 , 0 , Math.PI)
+    ctx.fillStyle = 'blue'
+    ctx.fill()
+
+    ctx.beginPath()
+    ctx.strokeStyle = 'red'
+    ctx.moveTo(canvas.width/2 - 38,canvas.height - 60)
+    ctx.lineTo(canvas.width/2 - 80,canvas.height - 70)
+    ctx.stroke()
+    ctx.beginPath()
+    ctx.strokeStyle = 'red'
+    ctx.moveTo(canvas.width/2 - 38,canvas.height - 60)
+    ctx.lineTo(canvas.width/2 - 80,canvas.height - 50)
+    ctx.stroke()
+    ctx.beginPath()
+    ctx.strokeStyle = 'red'
+    ctx.moveTo(canvas.width/2 + 38,canvas.height - 60)
+    ctx.lineTo(canvas.width/2 + 80,canvas.height - 70)
+    ctx.stroke()
+    ctx.beginPath()
+    ctx.strokeStyle = 'red'
+    ctx.moveTo(canvas.width/2 + 38,canvas.height - 60)
+    ctx.lineTo(canvas.width/2 + 80,canvas.height - 50)
+    ctx.stroke()
+    let color = 0
+    canvas.addEventListener('click' , function (event) {
+        ctx.beginPath()
+        ctx.arc(righteye, poseye, radeye, 0, 2 * Math.PI)
+
+        if(color === 0) {
+            ctx.fillStyle = 'red'
+            color++
+        } else {
+            ctx.fillStyle = 'yellow'
+            color--
+        }
+        ctx.fill()
+        ctx.closePath()
+    })
+</script>
+</body>
+</html>
