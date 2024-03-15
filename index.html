@@ -5,18 +5,99 @@
     <title>smile</title>
 
     <style>
+        body{
+            display: flex;
+        }
         canvas {
             border: 2px solid black;
+        }
+.pos{
+    margin-top: 100px;
+}
+        .red {
+            background-color: red;
+            color: aliceblue;
+        }
+
+        .blue {
+            background-color: blue;
+            color: aliceblue;
+        }
+
+        .green {
+            background-color: green;
+            color: aliceblue;
+        }
+
+        .colorInfo {
+            font-size: 50px;
+            margin: 0;
         }
     </style>
 </head>
 <body>
-<canvas id=canvas width="200" height="200"></canvas>
+<div>
+    <p id="color" class="colorInfo"></p>
+    <button id="red" class="red pos" >красная</button>
+    <button id="blue" class="blue pos">синия</button>
+    <button id="green" class="green pos">зеленая</button>
+</div>
+
+
+<canvas id=canvas width="500" height="500">
+</canvas>
 
 <script>
     const canvas = document.getElementById('canvas')
+    const button1 = document.getElementById('red')
+    const button2 = document.getElementById('blue')
+    const button3 = document.getElementById('green')
     const ctx = canvas.getContext('2d')
-    const radeye = 15;
+    const color = document.getElementById('color');
+
+    let x = 0;
+    let y = 0;
+    let num = 0
+    canvas.addEventListener('mousedown', function (event) {
+        x = event.clientX;
+        y = event.clientY;
+        drawSquer()
+    });
+
+    button1.addEventListener('mousedown', function (event) {
+        num = 1
+        color.innerHTML = "red";
+    });
+    button2.addEventListener('mousedown', function (event) {
+        num = 2
+        color.innerHTML = "blue";
+    });
+    button3.addEventListener('mousedown', function (event) {
+        num = 3
+        color.innerHTML = "green";
+    });
+
+    function drawSquer() {
+
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + 40, y);
+        ctx.lineTo(x + 40, y + 40);
+        ctx.lineTo(x, y + 40);
+        if (num === 1) {
+            ctx.fillStyle = 'red'
+        }
+        if (num === 2) {
+            ctx.fillStyle = 'blue'
+        }
+        if (num === 3) {
+            ctx.fillStyle = 'green'
+        }
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    /*const radeye = 15;
     const lefteye = canvas.width / 2 - 40;
     const righteye = canvas.width / 2 + 40;
     const poseye = canvas.height / 2 - 20;
@@ -83,6 +164,7 @@
                 ctx.stroke()
 
             }
+
             if(num === 7){
                 ctx.clearRect(0 , 0 , canvas.width , canvas.height)
                 num = 0
@@ -92,7 +174,7 @@
         }
         ctx.fill()
     })
-    /*let color = 0
+    let color = 0
     canvas.addEventListener('click' , function (event) {
         ctx.beginPath()
         ctx.arc(righteye, poseye, radeye, 0, 2 * Math.PI)
