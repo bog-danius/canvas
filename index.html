@@ -15,7 +15,7 @@
 
 
 
-<canvas id=canvas width="500" height="500">
+<canvas id=canvas width="520" height="520">
 </canvas>
 
 <script>
@@ -38,22 +38,20 @@
     ctx.fillStyle = 'black'
     }
     document.addEventListener('keydown', function (event) {
-        if (event.code === 'KeyW') {
-            y -= 40
-        }
-        if (event.code === 'KeyS') {
-            y += 40
-        }
-        if (event.code === 'KeyA') {
-            x -= 40
-        }
-        if (event.code === 'KeyD') {
-            x += 40
-        }
-        if (x-40 >= -40 && y +40<= canvas.width && y-40 >= -40 && y + 40 <= canvas.height) {
-
+            if (event.code === 'KeyW' && y - 40>=0) {
+                y -= 40
+            }
+            if (event.code === 'KeyS' && y + 80 <= canvas.height) {
+                y += 40
+            }
+            if (event.code === 'KeyA' && x -40>=0) {
+                x -= 40
+            }
+            if (event.code === 'KeyD' && x + 80 <= canvas.height) {
+                x += 40
+            }
             draw();
-        }
+
     });
     /*const canvas = document.getElementById('canvas')
     const button1 = document.getElementById('red')
