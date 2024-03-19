@@ -50,7 +50,10 @@
         if (event.code === 'KeyD') {
             x += 40
         }
-        draw()
+        if (x-40 >= -40 && y +40<= canvas.width && y-40 >= -40 && y + 40 <= canvas.height) {
+
+            draw();
+        }
     });
     /*const canvas = document.getElementById('canvas')
     const button1 = document.getElementById('red')
