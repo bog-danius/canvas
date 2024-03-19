@@ -5,43 +5,14 @@
     <title>smile</title>
 
     <style>
-        body{
-            display: flex;
-        }
         canvas {
             border: 2px solid black;
         }
-.pos{
-    margin-top: 100px;
-}
-        .red {
-            background-color: red;
-            color: aliceblue;
-        }
 
-        .blue {
-            background-color: blue;
-            color: aliceblue;
-        }
-
-        .green {
-            background-color: green;
-            color: aliceblue;
-        }
-
-        .colorInfo {
-            font-size: 50px;
-            margin: 0;
-        }
     </style>
 </head>
 <body>
-<div>
-    <p id="color" class="colorInfo"></p>
-    <button id="red" class="red pos" >красная</button>
-    <button id="blue" class="blue pos">синия</button>
-    <button id="green" class="green pos">зеленая</button>
-</div>
+
 
 
 <canvas id=canvas width="500" height="500">
@@ -49,6 +20,30 @@
 
 <script>
     const canvas = document.getElementById('canvas')
+    const ctx = canvas.getContext('2d')
+    let x = 0;
+    let y = 0;
+    function draw(){
+
+        ctx.clearRect( 0 , 0 ,canvas.width , canvas.height)
+        ctx.fillRect(x , y , 40 , 40)
+        x+=20;
+        y+=20;
+        /*if(x> canvas.width && y  < canvas.height){
+            x -=25;
+            y +=20;
+        }
+        if(x< canvas.width && y  > canvas.height){
+            x +=25;
+            y -=20;
+        }*/
+        if(x>canvas.width || y > canvas.height){
+            x = 0;
+            y = 0;
+        }
+    }
+    setInterval(draw, 500)
+    /*const canvas = document.getElementById('canvas')
     const button1 = document.getElementById('red')
     const button2 = document.getElementById('blue')
     const button3 = document.getElementById('green')
@@ -97,7 +92,7 @@
         ctx.fill();
     }
 
-    /*const radeye = 15;
+    const radeye = 15;
     const lefteye = canvas.width / 2 - 40;
     const righteye = canvas.width / 2 + 40;
     const poseye = canvas.height / 2 - 20;
