@@ -13,47 +13,61 @@
 </head>
 <body>
 
-
-
 <canvas id=canvas width="520" height="520">
 </canvas>
 
 <script>
     const canvas = document.getElementById('canvas')
     const ctx = canvas.getContext('2d')
-    let x = 0;
-    let y = 0;
-    ctx.fillRect(x , y , 40 , 40)
-    function draw(){
-
-        ctx.clearRect( 0 , 0 ,canvas.width , canvas.height)
-        ctx.fillRect(x , y , 40 , 40)
-        /*if(x> canvas.width && y  < canvas.height){
-            x -=25;
-            y +=20;
-        }
-        if(x< canvas.width && y  > canvas.height){
-            x +=25;
-            y -=20;
-        }*/
-    ctx.fillStyle = 'black'
+    const size = 40
+    let element = {
+        x: 0,
+        y: 0,
     }
-    document.addEventListener('keydown', function (event) {
-            if (event.code === 'KeyW' && y - 40>=0) {
-                y -= 40
-            }
-            if (event.code === 'KeyS' && y + 80 <= canvas.height) {
-                y += 40
-            }
-            if (event.code === 'KeyA' && x -40>=0) {
-                x -= 40
-            }
-            if (event.code === 'KeyD' && x + 80 <= canvas.height) {
-                x += 40
-            }
-            draw();
+    const arr = []
 
+    function draw() {
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        ctx.fillStyle = "red"
+        arr.forEach(elem => ctx.fillRect(elem.newX, elem.newY, size, size))
+        ctx.fillStyle = 'black'
+        ctx.fillRect(element.x, element.y, size, size)
+
+    }
+
+    document.addEventListener('keydown', function (event) {
+        switch (event.code) {
+            case 'Space':
+                arr.push({
+                    newX: element.x,
+                    newY: element.y,
+                })
+                break
+            case 'KeyW' :
+                if (element.y > 0 && element.y <= canvas.height) {
+                    element.y -= 40;
+                }
+                break;
+            case 'KeyS' :
+                if (element.y >= 0 && element.y + 80 <= canvas.height) {
+                    element.y += 40;
+                }
+                break;
+            case 'KeyD' :
+                if (element.x >= 0 && element.x + 80 <= canvas.height) {
+                    element.x += 40;
+                }
+                break;
+            case 'KeyA' :
+                if (element.x > 0 && element.x <= canvas.height) {
+                    element.x -= 40;
+                }
+                break;
+        }
+        draw();
     });
+    console.log(arr)
     /*const canvas = document.getElementById('canvas')
     const button1 = document.getElementById('red')
     const button2 = document.getElementById('blue')
