@@ -30,9 +30,46 @@
     const arr = []
     let color = 'black'
     ctx.fillRect(element.x, element.y, size, size)
+
     function draw() {
 
         ctx.clearRect(0, 0, canvas.width, canvas.height)
+        document.addEventListener('keydown', function (event) {
+            switch (event.code) {
+                case 'KeyW' :
+                    ctx.beginPath();
+                    ctx.moveTo(element.x + 20, element.y);
+                    ctx.lineTo(element.x + 20, element.y - 20);
+                    ctx.strokeStyle = '#02061f';
+                    ctx.lineWidth = 5;
+                    ctx.stroke();
+                    break;
+                case 'KeyS' :
+                    ctx.beginPath();
+                    ctx.moveTo(element.x + 20, element.y);
+                    ctx.lineTo(element.x + 20, element.y + 60);
+                    ctx.strokeStyle = '#02061f';
+                    ctx.lineWidth = 5;
+                    ctx.stroke();
+                    break;
+                case 'KeyD' :
+                    ctx.beginPath();
+                    ctx.moveTo(element.x, element.y + 20);
+                    ctx.lineTo(element.x + 60, element.y + 20);
+                    ctx.strokeStyle = '#02061f';
+                    ctx.lineWidth = 5;
+                    ctx.stroke();
+                    break;
+                case 'KeyA' :
+                    ctx.beginPath();
+                    ctx.moveTo(element.x, element.y + 20);
+                    ctx.lineTo(element.x - 20, element.y + 20);
+                    ctx.strokeStyle = '#02061f';
+                    ctx.lineWidth = 5;
+                    ctx.stroke();
+                    break;
+            }
+        })
         ctx.fillStyle = color;
         arr.forEach(elem => {
             ctx.fillRect(elem.newX, elem.newY, size, size)
@@ -40,7 +77,6 @@
         })
         ctx.fillStyle = 'black'
         ctx.fillRect(element.x, element.y, size, size)
-
     }
 
     document.addEventListener('keydown', function (event) {
@@ -56,45 +92,21 @@
                 if (element.y > 0 && element.y <= canvas.height) {
                     element.y -= 40;
                 }
-                ctx.beginPath();
-                ctx.moveTo(element.x, element.y);
-                ctx.lineTo(element.x, element.y - 100);
-                ctx.strokeStyle = '#02061f';
-                ctx.lineWidth = 5;
-                ctx.stroke();
                 break;
             case 'KeyS' :
                 if (element.y >= 0 && element.y + 80 <= canvas.height) {
                     element.y += 40;
                 }
-                ctx.beginPath();
-                ctx.moveTo(element.x, element.y);
-                ctx.lineTo(element.x, element.y + 100);
-                ctx.strokeStyle = '#02061f';
-                ctx.lineWidth = 5;
-                ctx.stroke();
                 break;
             case 'KeyD' :
                 if (element.x >= 0 && element.x + 80 <= canvas.height) {
                     element.x += 40;
                 }
-                ctx.beginPath();
-                ctx.moveTo(element.x, element.y);
-                ctx.lineTo(element.x + 100, element.y);
-                ctx.strokeStyle = '#02061f';
-                ctx.lineWidth = 5;
-                ctx.stroke();
                 break;
             case 'KeyA' :
                 if (element.x > 0 && element.x <= canvas.height) {
                     element.x -= 40;
                 }
-                ctx.beginPath();
-                ctx.moveTo(element.x, element.y);
-                ctx.lineTo(element.x - 100, element.y);
-                ctx.strokeStyle = '#02061f';
-                ctx.lineWidth = 5;
-                ctx.stroke();
                 break;
         }
         draw();
