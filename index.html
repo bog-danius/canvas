@@ -79,28 +79,28 @@
                 if (element.y > 0 && element.y <= canvas.height) {
                     element.y -= 40;
                     element.direction = 'up';
-                    turretAngle = -Math.PI / 2; // Устанавливаем угол дула для направления вверх
+                    turretAngle = -Math.PI / 2;
                 }
                 break;
             case 'KeyS' :
                 if (element.y >= 0 && element.y + 80 <= canvas.height) {
                     element.y += 40;
                     element.direction = 'down';
-                    turretAngle = Math.PI / 2; // Устанавливаем угол дула для направления вниз
+                    turretAngle = Math.PI / 2;
                 }
                 break;
             case 'KeyD' :
                 if (element.x >= 0 && element.x + 80 <= canvas.height) {
                     element.x += 40;
                     element.direction = 'right';
-                    turretAngle = 0; // Устанавливаем угол дула для направления вправо
+                    turretAngle = 0;
                 }
                 break;
             case 'KeyA' :
                 if (element.x > 0 && element.x <= canvas.height) {
                     element.x -= 40;
                     element.direction = 'left';
-                    turretAngle = Math.PI; // Устанавливаем угол дула для направления влево
+                    turretAngle = Math.PI;
                 }
                 break;
         }
