@@ -37,8 +37,9 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         arr.forEach(elem => {
-            ctx.fillRect(elem.newX, elem.newY, size, size)
             ctx.fillStyle = elem.color
+            ctx.fillRect(elem.newX, elem.newY, size, size)
+
         })
 
         drawTank(element.x, element.y);
