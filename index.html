@@ -19,64 +19,51 @@
 </canvas>
 
 <script>
-    const inp = document.getElementById('head')
-    canvas = document.getElementById('canvas')
-    const ctx = canvas.getContext('2d')
-    const size = 40
+
+    inp = document.getElementById('head');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const size = 40;
     let element = {
         x: 0,
         y: 0,
-    }
+        direction: 'right'
+    };
+    let turretAngle = 0;
     const arr = []
-    let color = 'black'
-    ctx.fillRect(element.x, element.y, size, size)
+
 
     function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-        document.addEventListener('keydown', function (event) {
-            switch (event.code) {
-                case 'KeyW' :
-                    ctx.beginPath();
-                    ctx.moveTo(element.x + 20, element.y);
-                    ctx.lineTo(element.x + 20, element.y - 20);
-                    ctx.strokeStyle = '#02061f';
-                    ctx.lineWidth = 5;
-                    ctx.stroke();
-                    break;
-                case 'KeyS' :
-                    ctx.beginPath();
-                    ctx.moveTo(element.x + 20, element.y);
-                    ctx.lineTo(element.x + 20, element.y + 60);
-                    ctx.strokeStyle = '#02061f';
-                    ctx.lineWidth = 5;
-                    ctx.stroke();
-                    break;
-                case 'KeyD' :
-                    ctx.beginPath();
-                    ctx.moveTo(element.x, element.y + 20);
-                    ctx.lineTo(element.x + 60, element.y + 20);
-                    ctx.strokeStyle = '#02061f';
-                    ctx.lineWidth = 5;
-                    ctx.stroke();
-                    break;
-                case 'KeyA' :
-                    ctx.beginPath();
-                    ctx.moveTo(element.x, element.y + 20);
-                    ctx.lineTo(element.x - 20, element.y + 20);
-                    ctx.strokeStyle = '#02061f';
-                    ctx.lineWidth = 5;
-                    ctx.stroke();
-                    break;
-            }
-        })
-        ctx.fillStyle = color;
         arr.forEach(elem => {
             ctx.fillRect(elem.newX, elem.newY, size, size)
             ctx.fillStyle = elem.color
         })
-        ctx.fillStyle = 'black'
-        ctx.fillRect(element.x, element.y, size, size)
+
+        drawTank(element.x, element.y);
+        drawTurret(element.x + size / 2, element.y + size / 2);
+        requestAnimationFrame(draw);
+    }
+
+    draw();
+
+    function drawTank(x, y) {
+        ctx.fillStyle = 'black';
+        ctx.fillRect(x, y, size, size);
+    }
+
+    function drawTurret(x, y) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(turretAngle);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(size / 2 + 20, 0);
+        ctx.strokeStyle = '#02061f';
+        ctx.lineWidth = 5;
+        ctx.stroke();
+        ctx.restore();
     }
 
     document.addEventListener('keydown', function (event) {
@@ -87,29 +74,36 @@
                     newY: element.y,
                     color: inp.value
                 })
-                break
+                break;
             case 'KeyW' :
                 if (element.y > 0 && element.y <= canvas.height) {
                     element.y -= 40;
+                    element.direction = 'up';
+                    turretAngle = -Math.PI / 2; // Устанавливаем угол дула для направления вверх
                 }
                 break;
             case 'KeyS' :
                 if (element.y >= 0 && element.y + 80 <= canvas.height) {
                     element.y += 40;
+                    element.direction = 'down';
+                    turretAngle = Math.PI / 2; // Устанавливаем угол дула для направления вниз
                 }
                 break;
             case 'KeyD' :
                 if (element.x >= 0 && element.x + 80 <= canvas.height) {
                     element.x += 40;
+                    element.direction = 'right';
+                    turretAngle = 0; // Устанавливаем угол дула для направления вправо
                 }
                 break;
             case 'KeyA' :
                 if (element.x > 0 && element.x <= canvas.height) {
                     element.x -= 40;
+                    element.direction = 'left';
+                    turretAngle = Math.PI; // Устанавливаем угол дула для направления влево
                 }
                 break;
         }
-        draw();
     });
     /*const canvas = document.getElementById('canvas')
     const button1 = document.getElementById('red')
