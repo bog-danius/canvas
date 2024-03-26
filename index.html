@@ -20,18 +20,26 @@
 
 <script>
 
-    inp = document.getElementById('head');
+    const inp = document.getElementById('head');
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
+
     const size = 40;
     let element = {
         x: 0,
         y: 0,
         direction: 'right'
     };
+    let bullet = {
+        x: 0,
+        y: 0,
+
+    };
+    let bullets = [];
+    const bulletSize = 10;
+
     let turretAngle = 0;
     const arr = []
-
 
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -44,6 +52,15 @@
 
         drawTank(element.x, element.y);
         drawTurret(element.x + size / 2, element.y + size / 2);
+        bullets.forEach(bullet => {
+            ctx.beginPath();
+            ctx.arc(bullet.x, bullet.y, bulletSize / 2, 0, Math.PI * 2);
+            ctx.fillStyle = 'black';
+            ctx.fill();
+            ctx.closePath();
+            bullet.x += Math.cos(bullet.angle) * 4;
+            bullet.y += Math.sin(bullet.angle) * 4;
+        });
         requestAnimationFrame(draw);
     }
 
@@ -60,7 +77,7 @@
         ctx.rotate(turretAngle);
         ctx.beginPath();
         ctx.moveTo(0, 0);
-        ctx.lineTo(size / 2 + 20, 0);
+        ctx.lineTo(size / 2 + size / 2, 0);
         ctx.strokeStyle = '#02061f';
         ctx.lineWidth = 5;
         ctx.stroke();
@@ -78,32 +95,68 @@
                 break;
             case 'KeyW' :
                 if (element.y > 0 && element.y <= canvas.height) {
-                    element.y -= 40;
+                    element.y -= size;
                     element.direction = 'up';
                     turretAngle = -Math.PI / 2;
                 }
                 break;
             case 'KeyS' :
                 if (element.y >= 0 && element.y + 80 <= canvas.height) {
-                    element.y += 40;
+                    element.y += size;
                     element.direction = 'down';
                     turretAngle = Math.PI / 2;
                 }
                 break;
             case 'KeyD' :
                 if (element.x >= 0 && element.x + 80 <= canvas.height) {
-                    element.x += 40;
+                    element.x += size;
                     element.direction = 'right';
                     turretAngle = 0;
                 }
                 break;
             case 'KeyA' :
                 if (element.x > 0 && element.x <= canvas.height) {
-                    element.x -= 40;
+                    element.x -= size;
                     element.direction = 'left';
                     turretAngle = Math.PI;
                 }
                 break;
+        }
+    });
+    canvas.addEventListener('mousedown', function (event) {
+        if (event.button === 0) {
+            const corner = turretAngle;
+            switch (element.direction) {
+                case 'down' :
+                    bullet = {
+                        x: element.x + size / 2,
+                        y: element.y + size / 2 + size,
+                        angle: corner
+                    };
+                    break;
+                case 'up' :
+                    bullet = {
+                        x: element.x + size / 2,
+                        y: element.y + size / 2 - size,
+                        angle: corner
+                    };
+                    break;
+                case 'left' :
+                    bullet = {
+                        x: element.x + size / 2 - size,
+                        y: element.y + size / 2,
+                        angle: corner
+                    };
+                    break;
+                case 'right' :
+                    bullet = {
+                        x: element.x + size / 2 + size,
+                        y: element.y + size / 2,
+                        angle: corner
+                    };
+                    break;
+            }
+            bullets.push(bullet); // Добавляем пулю в массив
         }
     });
     /*const canvas = document.getElementById('canvas')
