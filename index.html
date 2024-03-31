@@ -39,17 +39,43 @@
     const bulletSize = 10;
 
     let turretAngle = 0;
-    const arr = []
+    let squares = [];
+
+    //const arr = []
+    function generateSquares() {
+        squares = [];
+        for (let i = 0; i < 6; i++) {
+            const x = Math.floor(Math.random() * (canvas.width / size)) * size; // Random x coordinate
+            const y = Math.floor(Math.random() * (canvas.height / size)) * size; // Random y coordinate
+
+            squares.push({
+                x: x,
+                y: y,
+                size: size,
+                visible: true
+            });
+        }
+    }
+
+
+    function drawSquares() {
+        squares.forEach(square => {
+            if (square.visible) {
+                ctx.fillStyle = inp.value;
+                ctx.fillRect(square.x, square.y, square.size, square.size);
+            }
+        });
+    }
 
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        arr.forEach(elem => {
+        /*arr.forEach(elem => {
             ctx.fillStyle = elem.color
             ctx.fillRect(elem.newX, elem.newY, size, size)
 
-        })
-
+        })*/
+        drawSquares();
         drawTank(element.x, element.y);
         drawTurret(element.x + size / 2, element.y + size / 2);
         bullets.forEach(bullet => {
@@ -60,10 +86,18 @@
             ctx.closePath();
             bullet.x += Math.cos(bullet.angle) * 4;
             bullet.y += Math.sin(bullet.angle) * 4;
+
+            squares.forEach(square => {
+                if (square.visible && bullet.x > square.x && bullet.x < square.x + square.size &&
+                    bullet.y > square.y && bullet.y < square.y + square.size) {
+                    square.visible = false;
+                }
+            });
         });
         requestAnimationFrame(draw);
     }
 
+    generateSquares();
     draw();
 
     function drawTank(x, y) {
@@ -86,13 +120,13 @@
 
     document.addEventListener('keydown', function (event) {
         switch (event.code) {
-            case 'Space':
+            /*case 'Space':
                 arr.push({
                     newX: element.x,
                     newY: element.y,
                     color: inp.value
                 })
-                break;
+                break;*/
             case 'KeyW' :
                 if (element.y > 0 && element.y <= canvas.height) {
                     element.y -= size;
