@@ -19,7 +19,6 @@
 </canvas>
 
 <script>
-
     const inp = document.getElementById('head');
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
@@ -30,18 +29,14 @@
         y: 0,
         direction: 'right'
     };
-    let bullet = {
-        x: 0,
-        y: 0,
-
-    };
     let bullets = [];
     const bulletSize = 10;
 
     let turretAngle = 0;
     let squares = [];
 
-    //const arr = []
+    const arr = [];
+
     function generateSquares() {
         squares = [];
         for (let i = 0; i < 6; i++) {
@@ -57,7 +52,6 @@
         }
     }
 
-
     function drawSquares() {
         squares.forEach(square => {
             if (square.visible) {
@@ -70,15 +64,17 @@
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        /*arr.forEach(elem => {
-            ctx.fillStyle = elem.color
-            ctx.fillRect(elem.newX, elem.newY, size, size)
-
-        })*/
+        arr.forEach(elem => {
+            if (elem.image) {
+                ctx.drawImage(elem.image, elem.x, elem.y, size, size);
+            } else {
+                ctx.fillRect(elem.x, elem.y, size, size);
+            }
+        });
         drawSquares();
         drawTank(element.x, element.y);
         drawTurret(element.x + size / 2, element.y + size / 2);
-        bullets.forEach(bullet => {
+        bullets.forEach((bullet, index) => {
             ctx.beginPath();
             ctx.arc(bullet.x, bullet.y, bulletSize / 2, 0, Math.PI * 2);
             ctx.fillStyle = 'black';
@@ -91,8 +87,14 @@
                 if (square.visible && bullet.x > square.x && bullet.x < square.x + square.size &&
                     bullet.y > square.y && bullet.y < square.y + square.size) {
                     square.visible = false;
+                    let audio = new Audio('zvuk.mp3');
+                    audio.play();
+                    bullets.splice(index, 1);
                 }
             });
+            if (bullet.x < 0 || bullet.x > canvas.width || bullet.y < 0 || bullet.y > canvas.height) {
+                bullets.splice(index, 1);
+            }
         });
         requestAnimationFrame(draw);
     }
@@ -120,35 +122,31 @@
 
     document.addEventListener('keydown', function (event) {
         switch (event.code) {
-            /*case 'Space':
-                arr.push({
-                    newX: element.x,
-                    newY: element.y,
-                    color: inp.value
-                })
-                break;*/
-            case 'KeyW' :
+            case 'Space':
+                arr.push({x: element.x, y: element.y, image: img});
+                break;
+            case 'KeyW':
                 if (element.y > 0 && element.y <= canvas.height) {
                     element.y -= size;
                     element.direction = 'up';
                     turretAngle = -Math.PI / 2;
                 }
                 break;
-            case 'KeyS' :
+            case 'KeyS':
                 if (element.y >= 0 && element.y + 80 <= canvas.height) {
                     element.y += size;
                     element.direction = 'down';
                     turretAngle = Math.PI / 2;
                 }
                 break;
-            case 'KeyD' :
-                if (element.x >= 0 && element.x + 80 <= canvas.height) {
+            case 'KeyD':
+                if (element.x >= 0 && element.x + 80 <= canvas.width) {
                     element.x += size;
                     element.direction = 'right';
                     turretAngle = 0;
                 }
                 break;
-            case 'KeyA' :
+            case 'KeyA':
                 if (element.x > 0 && element.x <= canvas.height) {
                     element.x -= size;
                     element.direction = 'left';
@@ -157,40 +155,41 @@
                 break;
         }
     });
+    let img = new Image();
+    img.src = '128885.jpg';
     canvas.addEventListener('mousedown', function (event) {
         if (event.button === 0) {
             const corner = turretAngle;
             switch (element.direction) {
-                case 'down' :
-                    bullet = {
+                case 'down':
+                    bullets.push({
                         x: element.x + size / 2,
                         y: element.y + size / 2 + size,
                         angle: corner
-                    };
+                    });
                     break;
-                case 'up' :
-                    bullet = {
+                case 'up':
+                    bullets.push({
                         x: element.x + size / 2,
                         y: element.y + size / 2 - size,
                         angle: corner
-                    };
+                    });
                     break;
-                case 'left' :
-                    bullet = {
+                case 'left':
+                    bullets.push({
                         x: element.x + size / 2 - size,
                         y: element.y + size / 2,
                         angle: corner
-                    };
+                    });
                     break;
-                case 'right' :
-                    bullet = {
+                case 'right':
+                    bullets.push({
                         x: element.x + size / 2 + size,
                         y: element.y + size / 2,
                         angle: corner
-                    };
+                    });
                     break;
             }
-            bullets.push(bullet); // Добавляем пулю в массив
         }
     });
     /*const canvas = document.getElementById('canvas')
