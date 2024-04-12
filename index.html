@@ -5,7 +5,6 @@
     <title>smile</title>
 
     <style>
-
         canvas {
             border: 2px solid black;
         }
@@ -13,54 +12,107 @@
     </style>
 </head>
 <body>
+<span id = "count-bullet"></span>
+
 <label for="head"></label>
 <input type="color" id="head" name="head"/>
 <canvas id=canvas width="520" height="520">
 </canvas>
 
 <script>
+    const SIZE = 40;
+    const COUNT_BLOCKS = 6;
+    const BULLET_SIZE = 6;
+
+    const HEIGHT_TURRET = 10;
+    const WIDTH_TURRET = 25;
+
+
+
     const inp = document.getElementById('head');
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
 
-    const size = 40;
-    let element = {
-        x: 0,
-        y: 0,
-        direction: 'right'
-    };
-    let bullets = [];
-    const bulletSize = 10;
+    // Element for render
+    // [{type: "", ...}]
+    let arrayRenderElements = [];
 
-    let turretAngle = 0;
-    let squares = [];
+    function render() {
 
-    const arr = [];
+        arrayRenderElements = [
+            ...arrayBlock,
+            ...arrayBullet,
+            tank
+        ]
 
-    function generateSquares() {
-        squares = [];
-        for (let i = 0; i < 6; i++) {
-            const x = Math.floor(Math.random() * (canvas.width / size)) * size;
-            const y = Math.floor(Math.random() * (canvas.height / size)) * size;
 
-            squares.push({
-                x: x,
-                y: y,
-                size: size,
-                visible: true
-            });
-        }
-    }
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-    function drawSquares() {
-        squares.forEach(square => {
-            if (square.visible) {
-                ctx.fillStyle = inp.value;
-                ctx.fillRect(square.x, square.y, square.size, square.size);
+        arrayRenderElements.forEach(el => {
+            switch (el.type) {
+                case "block": {
+                    ctx.fillStyle = inp.value;
+                    ctx.fillRect(el.x, el.y, el.size, el.size);
+                    break;
+                }
+                case "tank": {
+                    ctx.fillStyle = 'gray';
+                    ctx.fillRect(el.x, el.y, el.size, el.size);
+
+                    switch (el.direction) {
+                        case 'right': ctx.fillRect(el.x + el.size, el.y + el.size / 2 - (HEIGHT_TURRET / 2), WIDTH_TURRET, HEIGHT_TURRET); break;
+                        case 'left': ctx.fillRect(el.x - WIDTH_TURRET, el.y + el.size / 2 - (HEIGHT_TURRET / 2), WIDTH_TURRET, HEIGHT_TURRET); break;
+                        case 'up': ctx.fillRect(el.x + el.size / 2 - HEIGHT_TURRET/2, el.y - WIDTH_TURRET, HEIGHT_TURRET, WIDTH_TURRET ); break;
+                        case 'down': ctx.fillRect(el.x + el.size / 2 - HEIGHT_TURRET/2, el.y + el.size, HEIGHT_TURRET, WIDTH_TURRET); break;
+                    }
+                    break;
+                }
+                case 'bullet': {
+                    ctx.beginPath();
+                    ctx.fillStyle = 'red';
+                    ctx.arc(el.x, el.y, el.size / 2, 0, Math.PI * 2);
+                    ctx.fill()
+                    ctx.closePath();
+                    break;
+                }
             }
-        });
+        })
+    }
+    function tick() {
+        const tickTime = (new Date()).getTime();
+
+        arrayBullet.forEach(bullet => {
+            // ms
+            const diffTime = tickTime - bullet.created;
+            switch (bullet.direction) {
+                case 'right': bullet.x = bullet.startX + diffTime * bullet.speed + WIDTH_TURRET; break;
+                case 'left': bullet.x = bullet.startX - diffTime * bullet.speed - WIDTH_TURRET; break;
+                case 'up': bullet.y = bullet.startY - diffTime * bullet.speed - WIDTH_TURRET; break;
+                case 'down': bullet.y = bullet.startY + diffTime * bullet.speed + WIDTH_TURRET; break;
+            }
+        })
+
+        arrayBullet = arrayBullet.filter(bullet => {
+            return pointInsideCanvas(bullet.x, bullet.y);
+        })
+
+        document.querySelector("#count-bullet").textContent = `Count: ${arrayBullet.length}`
     }
 
+    setInterval(render, 1_000 / 60)
+    setInterval(tick, 1_000 / 150)
+
+
+    /**
+     * MODEL DATA
+     */
+    const tank = generateTank();
+    const arrayBlock = generateBlock();
+    let arrayBullet = [];
+    /*******
+     */
+
+/*
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -99,7 +151,7 @@
         requestAnimationFrame(draw);
     }
 
-    generateSquares();
+
     draw();
 
     function drawTank(x, y) {
@@ -120,219 +172,85 @@
         ctx.restore();
     }
 
+*/
+
+    canvas.addEventListener('mousedown', function (event) {
+        if (event.button === 0) addBullet();
+    });
     document.addEventListener('keydown', function (event) {
         switch (event.code) {
-            case 'Space':
-                arr.push({x: element.x, y: element.y, image: img});
-                break;
             case 'KeyW':
-                if (element.y > 0 && element.y <= canvas.height) {
-                    element.y -= size;
-                    element.direction = 'up';
-                    turretAngle = -Math.PI / 2;
-                }
+                moveTank(0, -SIZE);
+                updateTankDirection('up')
                 break;
             case 'KeyS':
-                if (element.y >= 0 && element.y + 80 <= canvas.height) {
-                    element.y += size;
-                    element.direction = 'down';
-                    turretAngle = Math.PI / 2;
-                }
+                moveTank(0, SIZE);
+                updateTankDirection('down')
                 break;
             case 'KeyD':
-                if (element.x >= 0 && element.x + 80 <= canvas.width) {
-                    element.x += size;
-                    element.direction = 'right';
-                    turretAngle = 0;
-                }
+                moveTank(SIZE, 0);
+                updateTankDirection('right')
                 break;
             case 'KeyA':
-                if (element.x > 0 && element.x <= canvas.height) {
-                    element.x -= size;
-                    element.direction = 'left';
-                    turretAngle = Math.PI;
-                }
+                moveTank(-SIZE, 0);
+                updateTankDirection('left')
                 break;
         }
     });
-    let img = new Image();
-    img.src = '128885.jpg';
-    canvas.addEventListener('mousedown', function (event) {
-        if (event.button === 0) {
-            const corner = turretAngle;
-            switch (element.direction) {
-                case 'down':
-                    bullets.push({
-                        x: element.x + size / 2,
-                        y: element.y + size / 2 + size,
-                        angle: corner
-                    });
-                    break;
-                case 'up':
-                    bullets.push({
-                        x: element.x + size / 2,
-                        y: element.y + size / 2 - size,
-                        angle: corner
-                    });
-                    break;
-                case 'left':
-                    bullets.push({
-                        x: element.x + size / 2 - size,
-                        y: element.y + size / 2,
-                        angle: corner
-                    });
-                    break;
-                case 'right':
-                    bullets.push({
-                        x: element.x + size / 2 + size,
-                        y: element.y + size / 2,
-                        angle: corner
-                    });
-                    break;
-            }
-        }
-    });
-    /*const canvas = document.getElementById('canvas')
-    const button1 = document.getElementById('red')
-    const button2 = document.getElementById('blue')
-    const button3 = document.getElementById('green')
-    const ctx = canvas.getContext('2d')
-    const color = document.getElementById('color');
 
-    let x = 0;
-    let y = 0;
-    let num = 0
-    canvas.addEventListener('mousedown', function (event) {
-        x = event.clientX-220;
-        y = event.clientY-25;
-        drawSquer()
-    });
 
-    button1.addEventListener('mousedown', function (event) {
-        num = 1
-        color.innerHTML = "red";
-    });
-    button2.addEventListener('mousedown', function (event) {
-        num = 2
-        color.innerHTML = "blue";
-    });
-    button3.addEventListener('mousedown', function (event) {
-        num = 3
-        color.innerHTML = "green";
-    });
-
-    function drawSquer() {
-
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.lineTo(x + 40, y);
-        ctx.lineTo(x + 40, y + 40);
-        ctx.lineTo(x, y + 40);
-        if (num === 1) {
-            ctx.fillStyle = 'red'
-        }
-        if (num === 2) {
-            ctx.fillStyle = 'blue'
-        }
-        if (num === 3) {
-            ctx.fillStyle = 'green'
-        }
-        ctx.closePath();
-        ctx.fill();
+    function pointInsideCanvas(x, y) {
+        return x >= 0 && y >= 0 && x <= canvas.width && y <= canvas.height;
+    }
+    function updateTankDirection(dir) {
+        tank.direction = dir;
+    }
+    function moveTank(offsetX, offsetY) {
+        tank.x = tank.x + offsetX;
+        tank.y = tank.y + offsetY;
     }
 
-    const radeye = 15;
-    const lefteye = canvas.width / 2 - 40;
-    const righteye = canvas.width / 2 + 40;
-    const poseye = canvas.height / 2 - 20;
-    console.log(lefteye, righteye, poseye)
-    let num = 1;
-    document.addEventListener('keydown', function (event) {
-        console.log(event)
-        ctx.beginPath()
-        if (event.code === 'Space') {
+    function addBullet() {
+        const startX = tank.x + tank.size / 2;
+        const startY = tank.y + tank.size / 2;
+        arrayBullet.push({
+            startX,
+            startY,
+            x: startX,
+            y: startY,
+            size: 10,
+            type: 'bullet',
+            speed: (SIZE * 2) / 1_000,
+            direction: tank.direction,
+            created: (new Date()).getTime()
+        });
+    }
 
-            if (num === 1) {
-                ctx.beginPath()
-                ctx.arc(canvas.width / 2, canvas.height / 2, 100, 0, 2 * Math.PI)
-                ctx.fillStyle = 'black'
-                ctx.fill()
-            }
-            if (num === 2) {
-                ctx.beginPath()
-                ctx.arc(lefteye, poseye, radeye, 0, 2 * Math.PI)
-                ctx.fillStyle = 'yellow'
-                ctx.fill()
+    function generateBlock() {
+        return Array.from({length: COUNT_BLOCKS})
+        .map(() => {
+            const x = Math.floor(Math.random() * (canvas.width / SIZE)) * SIZE;
+            const y = Math.floor(Math.random() * (canvas.height / SIZE)) * SIZE;
 
+            return {
+                x,
+                y,
+                size: SIZE,
+                type: "block",
+                color: "#000"
             }
-            if (num === 3) {
-                ctx.beginPath()
-                ctx.arc(righteye, poseye, radeye, 0, 2 * Math.PI)
-                ctx.fillStyle = 'yellow'
-                ctx.fill()
+        })
+    }
 
-            }
-            if (num === 4) {
-                ctx.beginPath()
-                ctx.arc(canvas.width / 2, canvas.height / 2 + 30, 40, 0, Math.PI)
-                ctx.fillStyle = 'blue'
-                ctx.fill()
-
-            }
-            if(num === 5){
-                ctx.beginPath()
-                ctx.arc(canvas.width / 2, canvas.height / 2, 5, 0, 2 * Math.PI)
-                ctx.fillStyle = 'green'
-                ctx.fill()
-            }
-            if (num === 6) {
-                ctx.beginPath()
-                ctx.strokeStyle = 'red'
-                ctx.moveTo(canvas.width / 2 - 38, canvas.height - 60)
-                ctx.lineTo(canvas.width / 2 - 80, canvas.height - 70)
-                ctx.stroke()
-                ctx.beginPath()
-                ctx.strokeStyle = 'red'
-                ctx.moveTo(canvas.width / 2 - 38, canvas.height - 60)
-                ctx.lineTo(canvas.width / 2 - 80, canvas.height - 50)
-                ctx.stroke()
-                ctx.beginPath()
-                ctx.strokeStyle = 'red'
-                ctx.moveTo(canvas.width / 2 + 38, canvas.height - 60)
-                ctx.lineTo(canvas.width / 2 + 80, canvas.height - 70)
-                ctx.stroke()
-                ctx.beginPath()
-                ctx.strokeStyle = 'red'
-                ctx.moveTo(canvas.width / 2 + 38, canvas.height - 60)
-                ctx.lineTo(canvas.width / 2 + 80, canvas.height - 50)
-                ctx.stroke()
-
-            }
-
-            if(num === 7){
-                ctx.clearRect(0 , 0 , canvas.width , canvas.height)
-                num = 0
-            }
-            num++
-
+    function generateTank() {
+        return {
+            x: 0,
+            y: 0,
+            size: SIZE,
+            type: "tank",
+            direction: 'right'
         }
-        ctx.fill()
-    })
-    let color = 0
-    canvas.addEventListener('click' , function (event) {
-        ctx.beginPath()
-        ctx.arc(righteye, poseye, radeye, 0, 2 * Math.PI)
-
-        if(color === 0) {
-            ctx.fillStyle = 'red'
-            color++
-        } else {
-            ctx.fillStyle = 'yellow'
-            color--
-        }
-        ctx.fill()
-        ctx.closePath()
-    })*/
+    }
 </script>
 </body>
 </html>
