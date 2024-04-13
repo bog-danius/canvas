@@ -12,7 +12,7 @@
     </style>
 </head>
 <body>
-<span id = "count-bullet"></span>
+<span id="count-bullet"></span>
 
 <label for="head"></label>
 <input type="color" id="head" name="head"/>
@@ -26,7 +26,6 @@
 
     const HEIGHT_TURRET = 10;
     const WIDTH_TURRET = 25;
-
 
 
     const inp = document.getElementById('head');
@@ -60,10 +59,18 @@
                     ctx.fillRect(el.x, el.y, el.size, el.size);
 
                     switch (el.direction) {
-                        case 'right': ctx.fillRect(el.x + el.size, el.y + el.size / 2 - (HEIGHT_TURRET / 2), WIDTH_TURRET, HEIGHT_TURRET); break;
-                        case 'left': ctx.fillRect(el.x - WIDTH_TURRET, el.y + el.size / 2 - (HEIGHT_TURRET / 2), WIDTH_TURRET, HEIGHT_TURRET); break;
-                        case 'up': ctx.fillRect(el.x + el.size / 2 - HEIGHT_TURRET/2, el.y - WIDTH_TURRET, HEIGHT_TURRET, WIDTH_TURRET ); break;
-                        case 'down': ctx.fillRect(el.x + el.size / 2 - HEIGHT_TURRET/2, el.y + el.size, HEIGHT_TURRET, WIDTH_TURRET); break;
+                        case 'right':
+                            ctx.fillRect(el.x + el.size, el.y + el.size / 2 - (HEIGHT_TURRET / 2), WIDTH_TURRET, HEIGHT_TURRET);
+                            break;
+                        case 'left':
+                            ctx.fillRect(el.x - WIDTH_TURRET, el.y + el.size / 2 - (HEIGHT_TURRET / 2), WIDTH_TURRET, HEIGHT_TURRET);
+                            break;
+                        case 'up':
+                            ctx.fillRect(el.x + el.size / 2 - HEIGHT_TURRET / 2, el.y - WIDTH_TURRET, HEIGHT_TURRET, WIDTH_TURRET);
+                            break;
+                        case 'down':
+                            ctx.fillRect(el.x + el.size / 2 - HEIGHT_TURRET / 2, el.y + el.size, HEIGHT_TURRET, WIDTH_TURRET);
+                            break;
                     }
                     break;
                 }
@@ -78,20 +85,37 @@
             }
         })
     }
+
     function tick() {
         const tickTime = (new Date()).getTime();
 
-        arrayBullet.forEach(bullet => {
+        arrayBullet.forEach((bullet, index) => {
             // ms
             const diffTime = tickTime - bullet.created;
             switch (bullet.direction) {
-                case 'right': bullet.x = bullet.startX + diffTime * bullet.speed + WIDTH_TURRET; break;
-                case 'left': bullet.x = bullet.startX - diffTime * bullet.speed - WIDTH_TURRET; break;
-                case 'up': bullet.y = bullet.startY - diffTime * bullet.speed - WIDTH_TURRET; break;
-                case 'down': bullet.y = bullet.startY + diffTime * bullet.speed + WIDTH_TURRET; break;
+                case 'right':
+                    bullet.x = bullet.startX + diffTime * bullet.speed + WIDTH_TURRET * 2;
+                    break;
+                case 'left':
+                    bullet.x = bullet.startX - diffTime * bullet.speed - WIDTH_TURRET * 2;
+                    break;
+                case 'up':
+                    bullet.y = bullet.startY - diffTime * bullet.speed - WIDTH_TURRET * 2;
+                    break;
+                case 'down':
+                    bullet.y = bullet.startY + diffTime * bullet.speed + WIDTH_TURRET * 2;
+                    break;
             }
-        })
+            arrayBlock.forEach(block => {
+                if (bullet.x <= block.x + 40 && bullet.x >= block.x && bullet.y <= block.y + 40 && bullet.y >= block.y) {
 
+                    arrayBullet.splice(index, 1)
+                    arrayBlock.splice(arrayBlock.indexOf(block), 1)
+                    let audio = new Audio('zvuk.mp3');
+                    audio.play();
+                }
+            })
+        })
         arrayBullet = arrayBullet.filter(bullet => {
             return pointInsideCanvas(bullet.x, bullet.y);
         })
@@ -112,76 +136,79 @@
     /*******
      */
 
-/*
-    function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    /*
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        arr.forEach(elem => {
-            if (elem.image) {
-                ctx.drawImage(elem.image, elem.x, elem.y, size, size);
-            } else {
-                ctx.fillRect(elem.x, elem.y, size, size);
-            }
-        });
-        drawSquares();
-        drawTank(element.x, element.y);
-        drawTurret(element.x + size / 2, element.y + size / 2);
-        bullets.forEach((bullet, index) => {
-            ctx.beginPath();
-            ctx.arc(bullet.x, bullet.y, bulletSize / 2, 0, Math.PI * 2);
-            ctx.fillStyle = 'black';
-            ctx.fill();
-            ctx.closePath();
-            bullet.x += Math.cos(bullet.angle) * 4;
-            bullet.y += Math.sin(bullet.angle) * 4;
+            arr.forEach(elem => {
+                if (elem.image) {
+                    ctx.drawImage(elem.image, elem.x, elem.y, size, size);
+                } else {
+                    ctx.fillRect(elem.x, elem.y, size, size);
+                }
+            });
+            drawSquares();
+            drawTank(element.x, element.y);
+            drawTurret(element.x + size / 2, element.y + size / 2);
+            bullets.forEach((bullet, index) => {
+                ctx.beginPath();
+                ctx.arc(bullet.x, bullet.y, bulletSize / 2, 0, Math.PI * 2);
+                ctx.fillStyle = 'black';
+                ctx.fill();
+                ctx.closePath();
+                bullet.x += Math.cos(bullet.angle) * 4;
+                bullet.y += Math.sin(bullet.angle) * 4;
 
-            squares.forEach(square => {
-                if (square.visible && bullet.x > square.x && bullet.x < square.x + square.size &&
-                    bullet.y > square.y && bullet.y < square.y + square.size) {
-                    square.visible = false;
-                    let audio = new Audio('zvuk.mp3');
-                    audio.play();
+                squares.forEach(square => {
+                    if (square.visible && bullet.x > square.x && bullet.x < square.x + square.size &&
+                        bullet.y > square.y && bullet.y < square.y + square.size) {
+                        square.visible = false;
+                        let audio = new Audio('zvuk.mp3');
+                        audio.play();
+                        bullets.splice(index, 1);
+                    }
+                });
+                if (bullet.x < 0 || bullet.x > canvas.width || bullet.y < 0 || bullet.y > canvas.height) {
                     bullets.splice(index, 1);
                 }
             });
-            if (bullet.x < 0 || bullet.x > canvas.width || bullet.y < 0 || bullet.y > canvas.height) {
-                bullets.splice(index, 1);
-            }
-        });
-        requestAnimationFrame(draw);
-    }
+            requestAnimationFrame(draw);
+        }
 
 
-    draw();
+        draw();
 
-    function drawTank(x, y) {
-        ctx.fillStyle = 'black';
-        ctx.fillRect(x, y, size, size);
-    }
+        function drawTank(x, y) {
+            ctx.fillStyle = 'black';
+            ctx.fillRect(x, y, size, size);
+        }
 
-    function drawTurret(x, y) {
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.rotate(turretAngle);
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(size / 2 + size / 2, 0);
-        ctx.strokeStyle = '#02061f';
-        ctx.lineWidth = 5;
-        ctx.stroke();
-        ctx.restore();
-    }
+        function drawTurret(x, y) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(turretAngle);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(size / 2 + size / 2, 0);
+            ctx.strokeStyle = '#02061f';
+            ctx.lineWidth = 5;
+            ctx.stroke();
+            ctx.restore();
+        }
 
-*/
+    */
 
     canvas.addEventListener('mousedown', function (event) {
         if (event.button === 0) addBullet();
+        let audio = new Audio('zvuk-gun.mp3');
+        audio.play();
     });
     document.addEventListener('keydown', function (event) {
         switch (event.code) {
             case 'KeyW':
                 moveTank(0, -SIZE);
                 updateTankDirection('up')
+
                 break;
             case 'KeyS':
                 moveTank(0, SIZE);
@@ -202,15 +229,30 @@
     function pointInsideCanvas(x, y) {
         return x >= 0 && y >= 0 && x <= canvas.width && y <= canvas.height;
     }
+
     function updateTankDirection(dir) {
         tank.direction = dir;
     }
+
     function moveTank(offsetX, offsetY) {
-        tank.x = tank.x + offsetX;
-        tank.y = tank.y + offsetY;
+        const newX = tank.x + offsetX;
+        const newY = tank.y + offsetY;
+
+        for (let i = 0; i < arrayBlock.length; i++) {
+            if (newX < arrayBlock[i].x + SIZE && newX + tank.size > arrayBlock[i].x && newY < arrayBlock[i].y + SIZE && newY + tank.size > arrayBlock[i].y) {
+                return;
+            }
+        }
+
+        if (newX >= 0 && newX <= canvas.width - tank.size && newY >= 0 && newY <= canvas.height - tank.size) {
+            tank.x = newX;
+            tank.y = newY;
+        }
     }
 
     function addBullet() {
+
+
         const startX = tank.x + tank.size / 2;
         const startY = tank.y + tank.size / 2;
         arrayBullet.push({
