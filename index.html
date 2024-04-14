@@ -19,7 +19,14 @@
 <canvas id=canvas width="520" height="520">
 </canvas>
 
+<script src = "./assets/js/Vector.js"></script>
+<script src = "./assets/js/Box.js"></script>
+<script src = "./assets/js/info.js"></script>
+<script src = "./assets/js/render.js"></script>
 <script>
+    const a = new Vector(1,2);
+    console.log(a)
+
     const SIZE = 40;
     const COUNT_BLOCKS = 6;
     const BULLET_SIZE = 6;
@@ -36,6 +43,8 @@
     // [{type: "", ...}]
     let arrayRenderElements = [];
 
+
+
     function render() {
 
         arrayRenderElements = [
@@ -48,12 +57,13 @@
         ctx.clearRect(0, 0, canvas.width, canvas.height)
 
         arrayRenderElements.forEach(el => {
+
+            if (el instanceof Box) {
+                ctx.fillStyle = inp.value;
+                ctx.fillRect(el.position.x, el.position.y, el.size, el.size);
+            }
+
             switch (el.type) {
-                case "block": {
-                    ctx.fillStyle = inp.value;
-                    ctx.fillRect(el.x, el.y, el.size, el.size);
-                    break;
-                }
                 case "tank": {
                     ctx.fillStyle = 'gray';
                     ctx.fillRect(el.x, el.y, el.size, el.size);
@@ -107,11 +117,11 @@
                     break;
             }
             arrayBlock.forEach(block => {
-                if (bullet.x <= block.x + 40 && bullet.x >= block.x && bullet.y <= block.y + 40 && bullet.y >= block.y) {
+                if (bullet.x <= block.position.x + 40 && bullet.x >= block.position.x && bullet.y <= block.position.y + 40 && bullet.y >= block.position.y) {
 
                     arrayBullet.splice(index, 1)
                     arrayBlock.splice(arrayBlock.indexOf(block), 1)
-                    let audio = new Audio('zvuk.mp3');
+                    let audio = new Audio('./assets/audio/bang.mp3');
                     audio.play();
                 }
             })
@@ -120,87 +130,26 @@
             return pointInsideCanvas(bullet.x, bullet.y);
         })
 
+        if (arrayBlock.length === 0) arrayBlock = generateBlock()
+
         document.querySelector("#count-bullet").textContent = `Count: ${arrayBullet.length}`
     }
 
     setInterval(render, 1_000 / 60)
     setInterval(tick, 1_000 / 150)
 
-
     /**
      * MODEL DATA
      */
     const tank = generateTank();
-    const arrayBlock = generateBlock();
+    let arrayBlock = generateBlock();
     let arrayBullet = [];
     /*******
      */
 
-    /*
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            arr.forEach(elem => {
-                if (elem.image) {
-                    ctx.drawImage(elem.image, elem.x, elem.y, size, size);
-                } else {
-                    ctx.fillRect(elem.x, elem.y, size, size);
-                }
-            });
-            drawSquares();
-            drawTank(element.x, element.y);
-            drawTurret(element.x + size / 2, element.y + size / 2);
-            bullets.forEach((bullet, index) => {
-                ctx.beginPath();
-                ctx.arc(bullet.x, bullet.y, bulletSize / 2, 0, Math.PI * 2);
-                ctx.fillStyle = 'black';
-                ctx.fill();
-                ctx.closePath();
-                bullet.x += Math.cos(bullet.angle) * 4;
-                bullet.y += Math.sin(bullet.angle) * 4;
-
-                squares.forEach(square => {
-                    if (square.visible && bullet.x > square.x && bullet.x < square.x + square.size &&
-                        bullet.y > square.y && bullet.y < square.y + square.size) {
-                        square.visible = false;
-                        let audio = new Audio('zvuk.mp3');
-                        audio.play();
-                        bullets.splice(index, 1);
-                    }
-                });
-                if (bullet.x < 0 || bullet.x > canvas.width || bullet.y < 0 || bullet.y > canvas.height) {
-                    bullets.splice(index, 1);
-                }
-            });
-            requestAnimationFrame(draw);
-        }
-
-
-        draw();
-
-        function drawTank(x, y) {
-            ctx.fillStyle = 'black';
-            ctx.fillRect(x, y, size, size);
-        }
-
-        function drawTurret(x, y) {
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.rotate(turretAngle);
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(size / 2 + size / 2, 0);
-            ctx.strokeStyle = '#02061f';
-            ctx.lineWidth = 5;
-            ctx.stroke();
-            ctx.restore();
-        }
-
-    */
-
     canvas.addEventListener('mousedown', function (event) {
         if (event.button === 0) addBullet();
-        let audio = new Audio('zvuk-gun.mp3');
+        let audio = new Audio('./assets/audio/zvuk-gun.mp3');
         audio.play();
     });
     document.addEventListener('keydown', function (event) {
@@ -251,8 +200,6 @@
     }
 
     function addBullet() {
-
-
         const startX = tank.x + tank.size / 2;
         const startY = tank.y + tank.size / 2;
         arrayBullet.push({
@@ -269,19 +216,18 @@
     }
 
     function generateBlock() {
-        return Array.from({length: COUNT_BLOCKS})
-        .map(() => {
-            const x = Math.floor(Math.random() * (canvas.width / SIZE)) * SIZE;
-            const y = Math.floor(Math.random() * (canvas.height / SIZE)) * SIZE;
+        const array =  Array.from({length: COUNT_BLOCKS})
+            .map(() => {
+                const x = Math.floor(Math.random() * (canvas.width / SIZE)) * SIZE;
+                const y = Math.floor(Math.random() * (canvas.height / SIZE)) * SIZE;
 
-            return {
-                x,
-                y,
-                size: SIZE,
-                type: "block",
-                color: "#000"
-            }
-        })
+                return new Box(
+                    new Vector(x, y),
+                    SIZE
+                )
+            })
+
+        return array;
     }
 
     function generateTank() {
