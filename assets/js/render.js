@@ -11,10 +11,17 @@ function render() {
     arrayRenderElements.forEach(el => {
 
         if (el instanceof Box) {
-            ctx.fillStyle = inp.value;
-            ctx.fillRect(el.position.x, el.position.y, el.size, el.size);
+            if(el.destroyed === false){
+                ctx.fillStyle = inp.value;
+                ctx.fillRect(el.x, el.y, el.size, el.size);
+            }
         }
-
+        if (el instanceof BoxWithArmor) {
+            if(el.destroyed === false){
+                ctx.fillStyle = el.color;
+                ctx.fillRect(el.x, el.y, el.size, el.size);
+            }
+        }
         switch (el.type) {
             case "tank": {
                 ctx.fillStyle = 'gray';
@@ -69,10 +76,9 @@ function tick() {
                 break;
         }
         arrayBlock.forEach(block => {
-            if (bullet.x <= block.position.x + 40 && bullet.x >= block.position.x && bullet.y <= block.position.y + 40 && bullet.y >= block.position.y) {
-
-                arrayBullet.splice(index, 1)
-                arrayBlock.splice(arrayBlock.indexOf(block), 1)
+            if (bullet.x <= block.x + 40 && bullet.x >= block.x && bullet.y <= block.y + 40 && bullet.y >= block.y) {
+                block.makeDamage()
+                arrayBullet.splice(index , 1);
                 let audio = new Audio('./assets/audio/bang.mp3');
                 audio.play();
             }
@@ -88,5 +94,4 @@ function tick() {
     document.querySelector("#count-bullet").textContent = `Count: ${arrayBullet.length}`
 }
 
-setInterval(render, 1_000 / 60)
-setInterval(tick, 1_000 / 150)
+

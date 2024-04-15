@@ -49,7 +49,7 @@ function moveTank(offsetX, offsetY) {
     const newY = tank.y + offsetY;
 
     for (let i = 0; i < arrayBlock.length; i++) {
-        if (newX < arrayBlock[i].position.x + SIZE && newX + tank.size > arrayBlock[i].position.x && newY < arrayBlock[i].position.y + SIZE && newY + tank.size > arrayBlock[i].position.y) {
+        if (newX < arrayBlock[i].x + SIZE && newX + tank.size > arrayBlock[i].x && newY < arrayBlock[i].y + SIZE && newY + tank.size > arrayBlock[i].y) {
             return;
         }
     }
@@ -78,14 +78,23 @@ function addBullet() {
 
 function generateBlock() {
     return Array.from({length: COUNT_BLOCKS})
-        .map(() => {
+        .map((_v, index) => {
             const x = Math.floor(Math.random() * (canvas.width / SIZE)) * SIZE;
             const y = Math.floor(Math.random() * (canvas.height / SIZE)) * SIZE;
-
-            return new Box(
-                new Vector(x, y),
-                SIZE
-            )
+            const position = new Vector(x, y);
+            if (index % 2) {
+                return new Box(
+                    position,
+                    SIZE
+                )
+            } else {
+                return new BoxWithArmor(
+                    position,
+                    SIZE,
+                    'blue',
+                    Math.floor(Math.random() * 4) + 2
+                )
+            }
         });
 }
 
